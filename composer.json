@@ -1,0 +1,48 @@
+{
+  "name": "urbantrout/site-language-redirection",
+  "type": "typo3-cms-extension",
+  "description": "",
+  "license": "GPL-2.0+",
+  "keywords": [
+    "TYPO3",
+    "extension",
+    "language",
+    "detection",
+    "localization",
+    "multilanguage"
+  ],
+  "authors": [
+    {
+      "name": "Harald Atteneder",
+      "email": "harald@urbantrout.io",
+      "homepage": "https://urbantrout.io",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "typo3/cms-core": "^9.5"
+  },
+  "replace": {
+    "site_language_detection": "self.version",
+    "typo3-ter/site-language-redirection": "self.version"
+  },
+  "autoload": {
+    "psr-4": {
+      "UrbanTrout\\SiteLanguageRedirection\\": "Classes"
+    }
+  },
+  "config": {
+    "vendor-dir": ".Build/vendor/",
+    "bin-dir": ".Build/bin/"
+  },
+  "extra": {
+    "typo3/cms": {
+      "cms-package-dir": "{$vendor-dir}/typo3/cms",
+      "web-dir": ".Build/Web",
+      "extension-key": "site_language_redirection"
+    }
+  },
+  "require-dev": {
+    "friendsofphp/php-cs-fixer": "^2.15"
+  }
+}

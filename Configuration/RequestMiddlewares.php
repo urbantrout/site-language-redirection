@@ -7,8 +7,8 @@ return [
         'urbantrout/site-language-redirection' => [
             'target' => RedirectionMiddleware::class,
             'after' => [
-                'typo3/cms-frontend/site'
-            ]
-        ]
-    ]
+                'typo3/cms-frontend/site',
+            ],
+        ],
+    ],
 ];

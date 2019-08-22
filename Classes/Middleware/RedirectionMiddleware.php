@@ -89,12 +89,26 @@ class RedirectionMiddleware implements MiddlewareInterface
 
         /** @var SiteLanguage[] $matchingSiteLanguages */
         $matchingSiteLanguages = array_filter(
-            $siteLanguages,
-            function ($language) use ($acceptLanguages) {
-                /** @var SiteLanguage $language */
-                return in_array($language->getTwoLetterIsoCode(), $acceptLanguages);
+            $acceptLanguages,
+            function ($language) use ($siteLanguages) {
+                return in_array(
+                    $language,
+                    array_map(function ($siteLanguage) {
+                        /** @var SiteLanguage $siteLanguage */
+                        return $siteLanguage->getTwoLetterIsoCode();
+                    }, $siteLanguages)
+                );
             }
         );
+
+        $matchingSiteLanguages = array_map(function ($item) {
+            return array_shift($item);
+        }, array_map(function ($matchingSiteLanguage) use ($siteLanguages) {
+            return array_filter($siteLanguages, function ($siteLanguage) use ($matchingSiteLanguage) {
+                /** @var SiteLanguage $siteLanguage */
+                return $siteLanguage->getTwoLetterIsoCode() === $matchingSiteLanguage;
+            });
+        }, $matchingSiteLanguages));
 
         // Do not redirect if language is not available.
         if (empty($matchingSiteLanguages)) {

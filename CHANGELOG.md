@@ -1,3 +1,7 @@
+# 1.0.3
+
+- Add description to ext_emconf.php
+
 # 1.0.2
 
 - Fix bug with Accept-Language order

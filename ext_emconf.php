@@ -1,10 +1,10 @@
 <?php
 $EM_CONF[$_EXTKEY] = [
     'title' => 'Site Language Redirection',
-    'description' => '',
+    'description' => 'PSR-15 middleware to redirect user to correct site language. HTTP headers (browser language)',
     'category' => 'misc',
     'shy' => 0,
-    'version' => '1.0.2',
+    'version' => '1.0.3',
     'state' => 'stable',
     'uploadfolder' => 0,
     'clearcacheonload' => 0,

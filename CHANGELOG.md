@@ -1,3 +1,7 @@
+# 1.0.4
+
+- Fix typo in composer.json
+
 # 1.0.3
 
 - Add description to ext_emconf.php

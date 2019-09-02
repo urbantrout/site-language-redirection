@@ -23,7 +23,7 @@
     "typo3/cms-core": "^9.5"
   },
   "replace": {
-    "site_language_detection": "self.version",
+    "site_language_redirection": "self.version",
     "typo3-ter/site-language-redirection": "self.version"
   },
   "autoload": {

@@ -20,7 +20,7 @@
     }
   ],
   "require": {
-    "typo3/cms-core": "^9.5"
+    "typo3/cms-core": "^9.5||^10.0"
   },
   "replace": {
     "site_language_redirection": "self.version",

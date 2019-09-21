@@ -4,7 +4,7 @@ $EM_CONF[$_EXTKEY] = [
     'description' => 'PSR-15 middleware to redirect user to correct site language via HTTP headers (Accept-Language)',
     'category' => 'misc',
     'shy' => 0,
-    'version' => '1.0.4',
+    'version' => '1.0.5',
     'state' => 'stable',
     'uploadfolder' => 0,
     'clearcacheonload' => 0,
@@ -14,7 +14,7 @@ $EM_CONF[$_EXTKEY] = [
     'constraints' => [
         'depends' => [
             'php' => '7.0.0-7.9.99',
-            'typo3' => '9.5.0-9.5.99',
+            'typo3' => '9.5.0-10.9.99',
         ],
         'conflicts' => [],
         'suggests' => [],

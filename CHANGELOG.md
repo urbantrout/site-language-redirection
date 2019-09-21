@@ -1,3 +1,7 @@
+# 1.0.5
+
+- Update composer dependencies to also support TYPO3 10
+
 # 1.0.4
 
 - Fix typo in composer.json

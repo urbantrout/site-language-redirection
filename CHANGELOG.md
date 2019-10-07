@@ -1,3 +1,7 @@
+# 1.2.0
+
+- Add IP based language redirects.
+
 # 1.1.0
 
 - Add differentiation between "en-gb" & "en-us", etc. (Fixes https://github.com/urbantrout/site-language-redirection/issues/1)

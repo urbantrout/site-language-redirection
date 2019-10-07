@@ -77,10 +77,8 @@ class RedirectionMiddleware implements MiddlewareInterface
         if (!empty($acceptLanguages)) {
             $acceptLanguages = array_unique(
                 array_map(function ($language) {
-                    return explode('-', $language)[0];
-                }, array_map(function ($language) {
                     return explode(';', $language)[0];
-                }, explode(',', $acceptLanguages[0])))
+                }, explode(',', $acceptLanguages[0]))
             );
         } else {
             // Do not redirect if no accept languages are set.
@@ -93,10 +91,16 @@ class RedirectionMiddleware implements MiddlewareInterface
             function ($language) use ($siteLanguages) {
                 return in_array(
                     $language,
-                    array_map(function ($siteLanguage) {
-                        /** @var SiteLanguage $siteLanguage */
-                        return $siteLanguage->getTwoLetterIsoCode();
-                    }, $siteLanguages)
+                    array_merge(
+                        array_map(function ($siteLanguage) {
+                            /** @var SiteLanguage $siteLanguage */
+                            return $siteLanguage->getHreflang();
+                        }, $siteLanguages),
+                        array_map(function ($siteLanguage) {
+                            /** @var SiteLanguage $siteLanguage */
+                            return $siteLanguage->getTwoLetterIsoCode();
+                        }, $siteLanguages)
+                    )
                 );
             }
         );
@@ -106,7 +110,7 @@ class RedirectionMiddleware implements MiddlewareInterface
         }, array_map(function ($matchingSiteLanguage) use ($siteLanguages) {
             return array_filter($siteLanguages, function ($siteLanguage) use ($matchingSiteLanguage) {
                 /** @var SiteLanguage $siteLanguage */
-                return $siteLanguage->getTwoLetterIsoCode() === $matchingSiteLanguage;
+                return $siteLanguage->getHreflang() === $matchingSiteLanguage || $siteLanguage->getTwoLetterIsoCode() === $matchingSiteLanguage;
             });
         }, $matchingSiteLanguages));
 

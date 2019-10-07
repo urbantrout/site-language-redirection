@@ -1,3 +1,7 @@
+# 1.1.0
+
+- Add differentiation between "en-gb" & "en-us", etc. (Fixes https://github.com/urbantrout/site-language-redirection/issues/1)
+
 # 1.0.5
 
 - Update composer dependencies to also support TYPO3 10

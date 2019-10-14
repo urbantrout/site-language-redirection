@@ -2,10 +2,13 @@
 declare(strict_types = 1);
 namespace UrbanTrout\SiteLanguageRedirection\Middleware;
 
+use GeoIp2\Database\Reader;
+use GeoIp2\Model\Country;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Http\NormalizedParams;
 use TYPO3\CMS\Core\Http\RedirectResponse;
 use TYPO3\CMS\Core\Http\Response;
@@ -17,6 +20,9 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class RedirectionMiddleware implements MiddlewareInterface
 {
+    const REDIRECT_METHOD_BROWSER = 1;
+    const REDIRECT_METHOD_IPADDRESS = 2;
+
     /**
      * Adds an instance of TYPO3\CMS\Core\Http\NormalizedParams as
      * attribute to $request object
@@ -40,7 +46,18 @@ class RedirectionMiddleware implements MiddlewareInterface
             return $response;
         }
 
-        $response = $this->getRedirectResponseByBrowserLanguage($request, $cookieName);
+        /** @var Site $site */
+        $site = $request->getAttribute('site');
+        // Set default method in case site configuration isn't yet updated.
+        $method = $site->getConfiguration()['SiteLanguageRedirectionMethod'] ?? self::REDIRECT_METHOD_BROWSER;
+
+        if ($method === self::REDIRECT_METHOD_BROWSER) {
+            $response = $this->getRedirectResponseByBrowserLanguage($request, $cookieName);
+        }
+        if ($method === self::REDIRECT_METHOD_IPADDRESS) {
+            $response = $this->getRedirectResponseByIPAddress($request, $cookieName);
+        }
+
         if ($response) {
             return $response;
         }
@@ -85,8 +102,8 @@ class RedirectionMiddleware implements MiddlewareInterface
             return null;
         }
 
-        /** @var SiteLanguage[] $matchingSiteLanguages */
-        $matchingSiteLanguages = array_filter(
+        /** @var array $matchingSiteLanguageCodes Array in the form of: ['de-AT', 'de', 'en'] */
+        $matchingSiteLanguageCodes = array_filter(
             $acceptLanguages,
             function ($language) use ($siteLanguages) {
                 return in_array(
@@ -105,33 +122,114 @@ class RedirectionMiddleware implements MiddlewareInterface
             }
         );
 
+        /** @var SiteLanguage[] $matchingSiteLanguages */
         $matchingSiteLanguages = array_map(function ($item) {
             return array_shift($item);
-        }, array_map(function ($matchingSiteLanguage) use ($siteLanguages) {
-            return array_filter($siteLanguages, function ($siteLanguage) use ($matchingSiteLanguage) {
+        }, array_map(function ($matchingSiteLanguageCode) use ($siteLanguages) {
+            return array_filter($siteLanguages, function ($siteLanguage) use ($matchingSiteLanguageCode) {
                 /** @var SiteLanguage $siteLanguage */
-                return $siteLanguage->getHreflang() === $matchingSiteLanguage || $siteLanguage->getTwoLetterIsoCode() === $matchingSiteLanguage;
+                return $siteLanguage->getHreflang() === $matchingSiteLanguageCode || $siteLanguage->getTwoLetterIsoCode() === $matchingSiteLanguageCode;
             });
-        }, $matchingSiteLanguages));
+        }, $matchingSiteLanguageCodes));
 
         // Do not redirect if language is not available.
         if (empty($matchingSiteLanguages)) {
             return null;
         }
-        /** @var SiteLanguage $language */
-        $language = array_shift($matchingSiteLanguages);
+        /** @var SiteLanguage $matchingSiteLanguage */
+        $matchingSiteLanguage = array_shift($matchingSiteLanguages);
 
         // Do not redirect if the page is already requested in the correct language
-        if ($language === $requestLanguage) {
+        if ($matchingSiteLanguage === $requestLanguage) {
             return null;
         }
 
         $uri = $site->getRouter()->generateUri(
             $pageArguments->getPageId(),
-            ['_language' => $language]
+            ['_language' => $matchingSiteLanguage]
         );
 
-        return new RedirectResponse($uri, 302);
+        /** @var RedirectResponse $response */
+        $response = new RedirectResponse($uri, 302);
+        return $response->withAddedHeader('Set-Cookie', $cookieName . '=' . $matchingSiteLanguage->getLanguageId() . '; Path=/; Max-Age=' . (time()+60*60*24*30));
+    }
+
+    /**
+     * Returns redirect response based on users IP address. GeoIP2 is used to
+     * get the country based on the visitors IP address.
+     *
+     * @param ServerRequestInterface $request
+     * @param string $cookieName
+     *
+     * @return ResponseInterface|null
+     */
+    protected function getRedirectResponseByIPAddress(ServerRequestInterface $request, $cookieName)
+    {
+        // Do not redirect if preferred language is set as cookie.
+        if (array_key_exists($cookieName, $request->getCookieParams())) {
+            return null;
+        }
+
+        /** @var Site $site */
+        $site = $request->getAttribute('site');
+        /** @var PageArguments $pageArguments */
+        $pageArguments = $request->getAttribute('routing');
+        /** @var SiteLanguage $requestLanguage */
+        $requestLanguage = $request->getAttribute('language');
+        /** @var SiteLanguage[] $siteLanguages */
+        $siteLanguages = $site->getLanguages();
+
+        $path = Environment::getVarPath() . '/sitelanguageredirection/';
+        $filename = 'GeoLite2-Country.mmdb';
+
+        $reader = new Reader($path . $filename);
+        try {
+            $ipAddress = $request->getAttribute('normalizedParams')->getRemoteAddress();
+
+            /** @var Country $country */
+            $country = $reader->country($ipAddress);
+            $geocodedIsoCode = $country->country->isoCode;
+
+            /** @var SiteLanguage[] $matchingSiteLanguageCodes */
+            $matchingSiteLanguages = array_filter(
+                $siteLanguages,
+                function ($siteLanguage) use ($geocodedIsoCode) {
+
+                    /**
+                     * Only use last 2 characters of hreflang (de-at, en, en-uk).
+                     *
+                     * TODO: Use something like static_info_tables to map countries to languages.
+                     */
+                    $siteLanguageIsoCode = strtoupper(substr($siteLanguage->getHreflang(), -2));
+                    return $siteLanguageIsoCode === $geocodedIsoCode;
+                }
+            );
+
+            // Do not redirect if language is not available.
+            if (empty($matchingSiteLanguages)) {
+                return null;
+            }
+
+            /** @var SiteLanguage $matchingSiteLanguage */
+            $matchingSiteLanguage = array_shift($matchingSiteLanguages);
+
+            // Do not redirect if the page is already requested in the correct language
+            if ($matchingSiteLanguage === $requestLanguage) {
+                return null;
+            }
+
+            $uri = $site->getRouter()->generateUri(
+                $pageArguments->getPageId(),
+                ['_language' => $matchingSiteLanguage]
+            );
+
+            /** @var RedirectResponse $response */
+            $response = new RedirectResponse($uri, 302);
+            return $response->withAddedHeader('Set-Cookie', $cookieName . '=' . $matchingSiteLanguage->getLanguageId() . '; Path=/; Max-Age=' . (time()+60*60*24*30));
+        } catch (\Throwable $e) {
+            // IP address is not in database. Do not redirect.
+            return null;
+        }
     }
 
     /**

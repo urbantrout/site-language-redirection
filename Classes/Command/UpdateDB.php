@@ -1,16 +1,20 @@
 <?php
 namespace UrbanTrout\SiteLanguageRedirection\Command;
 
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Error\Exception;
 use TYPO3\CMS\Core\Http\RequestFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class UpdateDB extends Command
+class UpdateDB extends Command implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
 
     protected function configure()
     {
@@ -23,6 +27,8 @@ class UpdateDB extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $io = new SymfonyStyle($input, $output);
+        $io->title('Fetching database');
         $path = Environment::getVarPath() . '/sitelanguageredirection/';
         $filename = 'GeoLite2-Country.mmdb';
 
@@ -40,8 +46,19 @@ class UpdateDB extends Command
                 $result = GeneralUtility::writeFileToTypo3tempDir($path . $filename, $content);
 
                 if (!empty($result)) {
-                    throw new Exception('Couldn\'t save DB file.');
+                    $logMessage = 'Couldn\'t save DB file.';
+                    $io->error($logMessage);
+                    $this->logger->error($logMessage);
+                    throw new Exception($logMessage);
                 }
+
+                $logMessage = 'DB file successfully saved to: ' . $path . $filename;
+                $this->logger->info($logMessage);
+                $io->success($logMessage);
+            } else {
+                $logMessage = 'Couldn\'t fetch file from geolite.maxmind.com.';
+                $io->error($logMessage);
+                $this->logger->error($logMessage);
             }
         }
     }

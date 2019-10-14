@@ -1,6 +1,7 @@
-# 1.2.0
+# 2.0.0
 
-- Add IP based language redirects.
+- Add IP address based redirect method.
+- Add documentation.
 
 # 1.1.0
 

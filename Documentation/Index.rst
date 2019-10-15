@@ -1,8 +1,3 @@
-.. ==================================================
-.. FOR YOUR INFORMATION
-.. --------------------------------------------------
-.. -*- coding: utf-8 -*- with BOM.
-
 .. include:: Includes.txt
 
 
@@ -53,3 +48,4 @@ PSR-15 middleware to redirect user to correct site language via HTTP headers (Ac
 
    Introduction
    Installation
+   Configuration

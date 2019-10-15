@@ -1,3 +1,11 @@
+# 2.1.0
+
+- Ignore search engine bots (Fixes https://github.com/urbantrout/site-language-redirection/issues/3)
+
+# 2.0.2
+
+- Update README
+
 # 2.0.1
 
 - Improve documentation

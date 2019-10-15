@@ -24,6 +24,11 @@ class RedirectionMiddleware implements MiddlewareInterface
     const REDIRECT_METHOD_IPADDRESS = 2;
 
     /**
+     * @var string
+     */
+    protected $botPattern = '/bot|google|baidu|bing|msn|teoma|slurp|yandex/i';
+
+    /**
      * Adds an instance of TYPO3\CMS\Core\Http\NormalizedParams as
      * attribute to $request object
      *
@@ -34,7 +39,17 @@ class RedirectionMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        /**
+         * TODO: add setting for cookieName.
+         */
         $cookieName = 'site-language-preference';
+
+        /**
+         * Do not redirect search engine bots.
+         */
+        if ($this->isBot($request)){
+            return $handler->handle($request);
+        }
 
         $response = $this->setCookieOnLanguageChange($request, $handler, $cookieName);
         if ($response) {
@@ -74,7 +89,7 @@ class RedirectionMiddleware implements MiddlewareInterface
      *
      * @return ResponseInterface|null
      */
-    protected function getRedirectResponseByBrowserLanguage(ServerRequestInterface $request, $cookieName)
+    protected function getRedirectResponseByBrowserLanguage(ServerRequestInterface $request, $cookieName): ?ResponseInterface
     {
         // Do not redirect if preferred language is set as cookie.
         if (array_key_exists($cookieName, $request->getCookieParams())) {
@@ -163,7 +178,7 @@ class RedirectionMiddleware implements MiddlewareInterface
      *
      * @return ResponseInterface|null
      */
-    protected function getRedirectResponseByIPAddress(ServerRequestInterface $request, $cookieName)
+    protected function getRedirectResponseByIPAddress(ServerRequestInterface $request, $cookieName): ?ResponseInterface
     {
         // Do not redirect if preferred language is set as cookie.
         if (array_key_exists($cookieName, $request->getCookieParams())) {
@@ -315,4 +330,20 @@ class RedirectionMiddleware implements MiddlewareInterface
         }
         return null;
     }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @return boolean
+     */
+    protected function isBot(ServerRequestInterface $request): bool
+    {
+        $userAgent = $request->getHeader('user-agent');
+
+        if (is_array($userAgent) && !empty($userAgent)) {
+            $userAgent = array_shift($userAgent);
+        }
+
+        return isset($userAgent) && preg_match($this->botPattern, $userAgent);
+    }
+
 }

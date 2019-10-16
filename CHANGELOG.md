@@ -1,3 +1,7 @@
+# 2.1.1
+
+- Add extension icon
+
 # 2.1.0
 
 - Ignore search engine bots (Fixes https://github.com/urbantrout/site-language-redirection/issues/3)

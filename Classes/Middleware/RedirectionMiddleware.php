@@ -343,7 +343,7 @@ class RedirectionMiddleware implements MiddlewareInterface
             $userAgent = array_shift($userAgent);
         }
 
-        return isset($userAgent) && preg_match($this->botPattern, $userAgent);
+        return is_string($userAgent) && preg_match($this->botPattern, $userAgent);
     }
 
 }

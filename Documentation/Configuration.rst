@@ -31,6 +31,12 @@ First you need to fetch a database file and store it on your server. This file i
 
          Use this option to periodically update your database file.
 
+   This step creates a file under `\TYPO3\CMS\Core\Core\Environment::getVarPath() . '/sitelanguageredirection/'` with all the geolocation information.
+
+   .. note::
+
+      This does not alter your SQL database.
+
 2. Update the preferred method in your site configuration in the tab **Site Language Redirection**. Defaults to HTTP headers.
 
    .. image:: Images/site-config.png

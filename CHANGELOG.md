@@ -1,3 +1,7 @@
+# 2.1.2
+
+- Fix Hreflang comparison (Closes [#13](https://github.com/urbantrout/site-language-redirection/issues/13))
+
 # 2.1.1
 
 - Add extension icon

@@ -5,6 +5,12 @@ PSR-15 middleware to redirect user to correct site language.
 - Language detection is based on HTTP headers (browser language) or IP address.
 - When the user switches the language, a cookie gets set to save the new language as preferred language.
 
+## How it works
+
+Example of how the extensions determines the site to redirect to via HTTP headers:
+
+If Accept-Language is `en-US,de-AT` it looks for sites with an hreflang of `en-US`. If there is no match it then looks for `en`. If there is still no match it repeats the same logic with `de-AT` and so on.
+
 ## Installation
 
 Install via Extension Manager or composer.  

@@ -47,7 +47,7 @@ class RedirectionMiddleware implements MiddlewareInterface
         /**
          * Do not redirect search engine bots.
          */
-        if ($this->isBot($request)){
+        if ($this->isBot($request)) {
             return $handler->handle($request);
         }
 
@@ -109,7 +109,7 @@ class RedirectionMiddleware implements MiddlewareInterface
         if (!empty($acceptLanguages)) {
             $acceptLanguages = array_unique(
                 array_map(function ($language) {
-                    return explode(';', $language)[0];
+                    return strtolower(explode(';', $language)[0]);
                 }, explode(',', $acceptLanguages[0]))
             );
         } else {
@@ -117,7 +117,7 @@ class RedirectionMiddleware implements MiddlewareInterface
             return null;
         }
 
-        /** @var array $matchingSiteLanguageCodes Array in the form of: ['de-AT', 'de', 'en'] */
+        /** @var array $matchingSiteLanguageCodes Array in the form of: ['de-at', 'de', 'en'] */
         $matchingSiteLanguageCodes = array_filter(
             $acceptLanguages,
             function ($language) use ($siteLanguages) {
@@ -126,7 +126,7 @@ class RedirectionMiddleware implements MiddlewareInterface
                     array_merge(
                         array_map(function ($siteLanguage) {
                             /** @var SiteLanguage $siteLanguage */
-                            return $siteLanguage->getHreflang();
+                            return strtolower($siteLanguage->getHreflang());
                         }, $siteLanguages),
                         array_map(function ($siteLanguage) {
                             /** @var SiteLanguage $siteLanguage */
@@ -143,7 +143,7 @@ class RedirectionMiddleware implements MiddlewareInterface
         }, array_map(function ($matchingSiteLanguageCode) use ($siteLanguages) {
             return array_filter($siteLanguages, function ($siteLanguage) use ($matchingSiteLanguageCode) {
                 /** @var SiteLanguage $siteLanguage */
-                return $siteLanguage->getHreflang() === $matchingSiteLanguageCode || $siteLanguage->getTwoLetterIsoCode() === $matchingSiteLanguageCode;
+                return strtolower($siteLanguage->getHreflang()) === $matchingSiteLanguageCode || $siteLanguage->getTwoLetterIsoCode() === $matchingSiteLanguageCode;
             });
         }, $matchingSiteLanguageCodes));
 
@@ -345,5 +345,4 @@ class RedirectionMiddleware implements MiddlewareInterface
 
         return is_string($userAgent) && preg_match($this->botPattern, $userAgent);
     }
-
 }

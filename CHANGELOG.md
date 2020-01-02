@@ -1,3 +1,7 @@
+# 2.1.3
+
+- Update composer dependencies
+
 # 2.1.2
 
 - Fix Hreflang comparison (Closes [#13](https://github.com/urbantrout/site-language-redirection/issues/13))

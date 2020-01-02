@@ -2,7 +2,7 @@
   "name": "urbantrout/site-language-redirection",
   "type": "typo3-cms-extension",
   "description": "",
-  "license": "GPL-2.0+",
+  "license": "GPL-2.0-or-later",
   "keywords": [
     "TYPO3",
     "extension",

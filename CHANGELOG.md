@@ -1,3 +1,7 @@
+# 2.1.4
+
+- Improve fallbacks for accept-language headers
+
 # 2.1.3
 
 - Update composer dependencies

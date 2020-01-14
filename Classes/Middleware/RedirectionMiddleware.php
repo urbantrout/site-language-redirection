@@ -117,9 +117,22 @@ class RedirectionMiddleware implements MiddlewareInterface
             return null;
         }
 
+        /** @var array $acceptLanguagesWithFallbacks */
+        $acceptLanguagesWithFallbacks = array_reduce($acceptLanguages, function ($accumulator, $item) {
+            array_push($accumulator, $item);
+
+            // Adds an additional entry to the array if $item looks like 'de-AT'.
+            // Redirects if browser language is 'de-AT' and site languages are 'de' and 'en'.
+            preg_match('/(.{2})\-/', $item, $matches);
+            if ($matches) {
+                array_push($accumulator, $matches[1]);
+            }
+            return $accumulator;
+        }, []);
+
         /** @var array $matchingSiteLanguageCodes Array in the form of: ['de-at', 'de', 'en'] */
         $matchingSiteLanguageCodes = array_filter(
-            $acceptLanguages,
+            $acceptLanguagesWithFallbacks,
             function ($language) use ($siteLanguages) {
                 return in_array(
                     $language,
@@ -333,7 +346,7 @@ class RedirectionMiddleware implements MiddlewareInterface
 
     /**
      * @param ServerRequestInterface $request
-     * @return boolean
+     * @return bool
      */
     protected function isBot(ServerRequestInterface $request): bool
     {

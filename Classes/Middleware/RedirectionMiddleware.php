@@ -105,6 +105,11 @@ class RedirectionMiddleware implements MiddlewareInterface
         /** @var SiteLanguage[] $siteLanguages */
         $siteLanguages = $site->getLanguages();
 
+        $siteLanguagesFallbacks = [];
+        if (is_array($site->getConfiguration()['SiteLanguageRedirectionFallbacks']) && !empty($site->getConfiguration()['SiteLanguageRedirectionFallbacks'])) {
+            $siteLanguagesFallbacks = $site->getConfiguration()['SiteLanguageRedirectionFallbacks'];
+        }
+
         $acceptLanguages = $request->getHeader('accept-language');
         if (!empty($acceptLanguages)) {
             $acceptLanguages = array_unique(
@@ -133,7 +138,7 @@ class RedirectionMiddleware implements MiddlewareInterface
         /** @var array $matchingSiteLanguageCodes Array in the form of: ['de-at', 'de', 'en'] */
         $matchingSiteLanguageCodes = array_filter(
             $acceptLanguagesWithFallbacks,
-            function ($language) use ($siteLanguages) {
+            function ($language) use ($siteLanguages, $siteLanguagesFallbacks) {
                 return in_array(
                     $language,
                     array_merge(
@@ -144,7 +149,10 @@ class RedirectionMiddleware implements MiddlewareInterface
                         array_map(function ($siteLanguage) {
                             /** @var SiteLanguage $siteLanguage */
                             return $siteLanguage->getTwoLetterIsoCode();
-                        }, $siteLanguages)
+                        }, $siteLanguages),
+                        array_map(function ($siteLanguagesFallback) {
+                            return $siteLanguagesFallback;
+                        }, array_keys($siteLanguagesFallbacks))
                     )
                 );
             }
@@ -153,10 +161,10 @@ class RedirectionMiddleware implements MiddlewareInterface
         /** @var SiteLanguage[] $matchingSiteLanguages */
         $matchingSiteLanguages = array_map(function ($item) {
             return array_shift($item);
-        }, array_map(function ($matchingSiteLanguageCode) use ($siteLanguages) {
-            return array_filter($siteLanguages, function ($siteLanguage) use ($matchingSiteLanguageCode) {
+        }, array_map(function ($matchingSiteLanguageCode) use ($siteLanguages, $siteLanguagesFallbacks) {
+            return array_filter($siteLanguages, function ($siteLanguage) use ($matchingSiteLanguageCode, $siteLanguagesFallbacks) {
                 /** @var SiteLanguage $siteLanguage */
-                return strtolower($siteLanguage->getHreflang()) === $matchingSiteLanguageCode || $siteLanguage->getTwoLetterIsoCode() === $matchingSiteLanguageCode;
+                return strtolower($siteLanguage->getHreflang()) === $matchingSiteLanguageCode || $siteLanguage->getTwoLetterIsoCode() === $matchingSiteLanguageCode || strtolower($siteLanguage->getHreflang()) === $siteLanguagesFallbacks[$matchingSiteLanguageCode] || $siteLanguage->getTwoLetterIsoCode() === $siteLanguagesFallbacks[$matchingSiteLanguageCode];
             });
         }, $matchingSiteLanguageCodes));
 

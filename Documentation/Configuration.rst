@@ -47,3 +47,16 @@ First you need to fetch a database file and store it on your server. This file i
    .. code-block:: yaml
 
       SiteLanguageRedirectionMethod: 2
+
+Language Fallbacks
+==================
+
+This feature adds the possibility to define fallback languages. So for instance, if there's no italian version of the website, redirect to english version, and so on.
+
+Site configuration would look like this with optional `SiteLanguageRedirectionFallbacks`:
+
+.. code-block:: yaml
+
+      SiteLanguageRedirectionFallbacks:
+         fr: 'en'
+         it: 'en'

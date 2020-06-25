@@ -35,3 +35,16 @@ Changing this value to **IP address** updates `config/sites/<sitename>/config.ya
 ```yaml
 SiteLanguageRedirectionMethod: 2
 ```
+
+### Configure Language Fallbacks
+
+This feature adds the possibility to define fallback languages. So for instance, if there's no italian version of the website, redirect to english version, and so on.
+
+Site configuration would look like this with optional `SiteLanguageRedirectionFallbacks`:
+
+```yaml
+SiteLanguageRedirectionMethod: 1
+SiteLanguageRedirectionFallbacks:
+  fr: 'en'
+  it: 'en'
+```

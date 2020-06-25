@@ -1,3 +1,7 @@
+# 2.2.0
+
+- Add language fallbacks. (Closes [#8](https://github.com/urbantrout/site-language-redirection/issues/8)) Thanks to Raphael Zschorsch
+
 # 2.1.4
 
 - Improve fallbacks for accept-language headers

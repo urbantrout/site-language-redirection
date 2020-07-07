@@ -288,7 +288,8 @@ class RedirectionMiddleware implements MiddlewareInterface
         /** @var SiteLanguage[] $siteLanguages */
         $siteLanguages = $site->getLanguages();
 
-        if ($normalizedParams->getHttpReferer() && strpos($normalizedParams->getHttpReferer(), 'android-app') === false) {
+        // Check if referrer is present and scheme is not `android-app`.
+        if ($normalizedParams->getHttpReferer() && substr($normalizedParams->getHttpReferer(), 0, 11) !== 'android-app') {
             /** @var Uri $refererUri */
             $refererUri = GeneralUtility::makeInstance(Uri::class, $normalizedParams->getHttpReferer());
             /** @var string[] $siteLanguageBasePaths */

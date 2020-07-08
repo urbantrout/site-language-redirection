@@ -1,3 +1,11 @@
+# 2.2.2
+
+- Fix error with android-app scheme (Closes (#6)[https://github.com/urbantrout/site-language-redirection/issues/6])
+
+# 2.2.1
+
+- Update documentation
+
 # 2.2.0
 
 - Add language fallbacks. (Closes [#8](https://github.com/urbantrout/site-language-redirection/issues/8)) Thanks to Raphael Zschorsch

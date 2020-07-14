@@ -26,7 +26,7 @@ class RedirectionMiddleware implements MiddlewareInterface
     /**
      * @var string
      */
-    protected $botPattern = '/bot|google|baidu|bing|msn|teoma|slurp|yandex/i';
+    protected $botPattern = '/bot|google|baidu|bing|msn|teoma|slurp|yandex|Chrome-Lighthouse/i';
 
     /**
      * Adds an instance of TYPO3\CMS\Core\Http\NormalizedParams as

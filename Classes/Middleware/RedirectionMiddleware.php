@@ -26,7 +26,7 @@ class RedirectionMiddleware implements MiddlewareInterface
     /**
      * @var string
      */
-    protected $botPattern = '/bot|google|baidu|bing|msn|teoma|slurp|yandex/i';
+    protected $botPattern = '/bot|google|baidu|bing|msn|teoma|slurp|yandex|Chrome-Lighthouse/i';
 
     /**
      * Adds an instance of TYPO3\CMS\Core\Http\NormalizedParams as
@@ -181,13 +181,19 @@ class RedirectionMiddleware implements MiddlewareInterface
             return null;
         }
 
+        /** @var array $parameters Array in the form of: ['utm_source' => 'google', 'utm_medium' => 'social'] */
+        $parameters = $request->getQueryParams();
+
+        $parameters['_language'] = $matchingSiteLanguage;
+
         $uri = $site->getRouter()->generateUri(
             $pageArguments->getPageId(),
-            ['_language' => $matchingSiteLanguage]
+            $parameters
         );
 
         /** @var RedirectResponse $response */
-        $response = new RedirectResponse($uri, 302);
+
+        $response = new RedirectResponse($uri, 307);
         return $response->withAddedHeader('Set-Cookie', $cookieName . '=' . $matchingSiteLanguage->getLanguageId() . '; Path=/; Max-Age=' . (60*60*24*30));
     }
 
@@ -255,13 +261,18 @@ class RedirectionMiddleware implements MiddlewareInterface
                 return null;
             }
 
+            /** @var array $parameters Array in the form of: ['utm_source' => 'google', 'utm_medium' => 'social'] */
+            $parameters = $request->getQueryParams();
+
+            $parameters['_language'] = $matchingSiteLanguage;
+
             $uri = $site->getRouter()->generateUri(
                 $pageArguments->getPageId(),
-                ['_language' => $matchingSiteLanguage]
+                $parameters
             );
 
             /** @var RedirectResponse $response */
-            $response = new RedirectResponse($uri, 302);
+            $response = new RedirectResponse($uri, 307);
             return $response->withAddedHeader('Set-Cookie', $cookieName . '=' . $matchingSiteLanguage->getLanguageId() . '; Path=/; Max-Age=' . (60*60*24*30));
         } catch (\Throwable $e) {
             // IP address is not in database. Do not redirect.
@@ -343,11 +354,16 @@ class RedirectionMiddleware implements MiddlewareInterface
                 $preferredSiteLanguage = $site->getLanguageById($languageId);
 
                 if ($preferredSiteLanguage !== $requestLanguage) {
+                    /** @var array $parameters Array in the form of: ['utm_source' => 'google', 'utm_medium' => 'social'] */
+                    $parameters = $request->getQueryParams();
+
+                    $parameters['_language'] = $preferredSiteLanguage;
+
                     $uri = $site->getRouter()->generateUri(
                         $pageArguments->getPageId(),
-                        ['_language' => $preferredSiteLanguage]
+                        $parameters
                     );
-                    return new RedirectResponse($uri, 302);
+                    return new RedirectResponse($uri, 307);
                 }
             }
         }

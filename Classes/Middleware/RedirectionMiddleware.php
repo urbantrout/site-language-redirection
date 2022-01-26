@@ -83,6 +83,7 @@ class RedirectionMiddleware implements MiddlewareInterface
 
     /**
      * Returns redirect response based on users browser language.
+     * Sets the cookie for 30 days.
      *
      * @param ServerRequestInterface $request
      * @param string $cookieName
@@ -191,13 +192,14 @@ class RedirectionMiddleware implements MiddlewareInterface
         );
 
         /** @var RedirectResponse $response */
+
         $response = new RedirectResponse($uri, 307);
-        return $response->withAddedHeader('Set-Cookie', $cookieName . '=' . $matchingSiteLanguage->getLanguageId() . '; Path=/; Max-Age=' . (time()+60*60*24*30));
+        return $response->withAddedHeader('Set-Cookie', $cookieName . '=' . $matchingSiteLanguage->getLanguageId() . '; Path=/; Max-Age=' . (60*60*24*30));
     }
 
     /**
      * Returns redirect response based on users IP address. GeoIP2 is used to
-     * get the country based on the visitors IP address.
+     * get the country based on the visitors IP address. Sets the cookie for 30 days.
      *
      * @param ServerRequestInterface $request
      * @param string $cookieName
@@ -271,7 +273,7 @@ class RedirectionMiddleware implements MiddlewareInterface
 
             /** @var RedirectResponse $response */
             $response = new RedirectResponse($uri, 307);
-            return $response->withAddedHeader('Set-Cookie', $cookieName . '=' . $matchingSiteLanguage->getLanguageId() . '; Path=/; Max-Age=' . (time()+60*60*24*30));
+            return $response->withAddedHeader('Set-Cookie', $cookieName . '=' . $matchingSiteLanguage->getLanguageId() . '; Path=/; Max-Age=' . (60*60*24*30));
         } catch (\Throwable $e) {
             // IP address is not in database. Do not redirect.
             return null;
@@ -279,7 +281,7 @@ class RedirectionMiddleware implements MiddlewareInterface
     }
 
     /**
-     * Sets cookie with preferred language when user changes language in the frontend.
+     * Sets cookie with preferred language when user changes language in the frontend for 30 days.
      *
      * @param ServerRequestInterface $request
      * @param RequestHandlerInterface $handler
@@ -317,7 +319,7 @@ class RedirectionMiddleware implements MiddlewareInterface
                 strpos($refererUri->getPath(), $requestLanguage->getBase()->getPath()) !== 0 ||
                 ($requestLanguage->getBase()->getPath() === '/' && !in_array($requestLanguage->getBase()->getPath(), $siteLanguageBasePaths))
             ) {
-                $response = $response->withAddedHeader('Set-Cookie', $cookieName . '=' . $requestLanguage->getLanguageId() . '; Path=/; Max-Age=' . (time()+60*60*24*30));
+                $response = $response->withAddedHeader('Set-Cookie', $cookieName . '=' . $requestLanguage->getLanguageId() . '; Path=/; Max-Age=' . (60*60*24*30));
             }
             return $response;
         }

@@ -1,6 +1,12 @@
+# 2.3.0
+
+- Fix Max-Age cookie value. ([#16](https://github.com/urbantrout/site-language-redirection/issues/16)) (thanks Aleksandra Fey)
+- Keep GET/POST parameters on redirect. ([#19](https://github.com/urbantrout/site-language-redirection/issues/19)) (thanks [@erguenyogurtcu](https://github.com/erguenyogurtcu))
+- Add Google PageSpeed Insights to bot pattern (thanks [@erguenyogurtcu](https://github.com/erguenyogurtcu))
+
 # 2.2.2
 
-- Fix error with android-app scheme (Closes (#6)[https://github.com/urbantrout/site-language-redirection/issues/6])
+- Fix error with android-app scheme (Closes [#6](https://github.com/urbantrout/site-language-redirection/issues/6))
 
 # 2.2.1
 

@@ -51,5 +51,4 @@ SiteLanguageRedirectionFallbacks:
 
 ### Update Bots Regex
 
-After copying a newer Bots.yaml, use the `composer regex:create` command to create a new copiable regex. I suggest piping it to
-a text file, f.E. regex.txt, and then Copy + Pasting the resulting string into the `\UrbanTrout\SiteLanguageRedirection\Middleware\RedirectionMiddleware::$botPattern`
+Details in Scripts/README.md

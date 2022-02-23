@@ -47,5 +47,10 @@
   },
   "suggest": {
       "typo3/cms-scheduler": "*"
+  },
+  "scripts": {
+    "regex:create": [
+      "@php Scripts/yamlToRegex.php"
+    ]
   }
 }

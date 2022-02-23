@@ -44,6 +44,17 @@ class RedirectionMiddleware implements MiddlewareInterface
          */
         $cookieName = 'site-language-preference';
 
+		// stop if somewhere in our rootline tx_sitelanguageredirection_stop has been set
+		$pageArguments = $request->getAttribute('routing');
+		$rootlineUtility = GeneralUtility::makeInstance(RootlineUtility::class, $pageArguments->getPageId());
+		/** @var RootlineUtility $rootlineUtility */
+		$pageRootline = $rootlineUtility->get();
+		foreach ($pageRootline as $pageItem) {
+			if (isset($pageItem['tx_sitelanguageredirection_stop']) && $pageItem['tx_sitelanguageredirection_stop'] === 1) {
+				return $handler->handle($request);
+			}
+		}
+
         /**
          * Do not redirect search engine bots.
          */

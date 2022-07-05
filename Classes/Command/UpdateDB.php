@@ -14,6 +14,8 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class UpdateDB extends Command implements LoggerAwareInterface
 {
+    const MAXMIND_LICENSE_KEY = '';
+    
     use LoggerAwareTrait;
 
     protected function configure()
@@ -30,36 +32,62 @@ class UpdateDB extends Command implements LoggerAwareInterface
         $io = new SymfonyStyle($input, $output);
         $io->title('Fetching database');
         $path = Environment::getVarPath() . '/sitelanguageredirection/';
+        $tarFilename = 'GeoLite2-Country.tar';
         $filename = 'GeoLite2-Country.mmdb';
 
         /** @var RequestFactory $requestFactory */
         $requestFactory = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Http\\RequestFactory');
-        $url = 'https://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.mmdb.gz';
-
+        $url = 'https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country&license_key=' . self::MAXMIND_LICENSE_KEY . '&suffix=tar.gz';
         // Return a PSR-7 compliant response object.
         $response = $requestFactory->request($url, 'GET');
 
         // Get the content as a stream on a successful request.
-        if ($response->getStatusCode() === 200) {
-            if (strpos($response->getHeaderLine('Content-Type'), 'application/octet-stream') === 0) {
-                $content = gzdecode($response->getBody()->getContents());
-                $result = GeneralUtility::writeFileToTypo3tempDir($path . $filename, $content);
+        if ($response->getStatusCode() === 200 && strpos($response->getHeaderLine('Content-Type'), 'application/gzip') === 0) {
+            $content = gzdecode($response->getBody()->getContents());
+            $result = GeneralUtility::writeFileToTypo3tempDir($path . $tarFilename, $content);
 
-                if (!empty($result)) {
-                    $logMessage = 'Couldn\'t save DB file.';
-                    $io->error($logMessage);
-                    $this->logger->error($logMessage);
-                    throw new Exception($logMessage);
-                }
-
-                $logMessage = 'DB file successfully saved to: ' . $path . $filename;
-                $this->logger->info($logMessage);
-                $io->success($logMessage);
-            } else {
-                $logMessage = 'Couldn\'t fetch file from geolite.maxmind.com.';
+            if (!empty($result)) {
+                $logMessage = 'Couldn\'t extract GZIP file.';
                 $io->error($logMessage);
                 $this->logger->error($logMessage);
+                throw new Exception($logMessage);
             }
+
+            $tar = new Archive_Tar($path . $tarFilename);
+            $tarContent = $tar->listContent();
+            $dbFiles = array_filter($tarContent, function ($content) use ($filename) {
+                $baseName = pathinfo($content['filename'], PATHINFO_BASENAME);
+                return $baseName === $filename;
+            });
+
+            if (empty($dbFiles)) {
+                $logMessage = "Couldn\'t find file '{$filename}' TAR file.";
+                $io->error($logMessage);
+                $this->logger->error($logMessage);
+                throw new Exception($logMessage);
+            }
+            $dbFile = reset($dbFiles);
+            /** @var string $dbFilePath Contains the directory path containing the database file */
+            $dbFilePath = pathinfo($dbFile['filename'], PATHINFO_DIRNAME);
+
+            $result = $tar->extractList([$dbFile['filename']], $path, $dbFilePath, false, false);
+
+            if (!$result) {
+                $logMessage = 'Couldn\'t extract TAR file.';
+                $io->error($logMessage);
+                $this->logger->error($logMessage);
+                throw new Exception($logMessage);
+            }
+
+            $logMessage = 'DB file successfully saved to: ' . $path . $filename;
+            $this->logger->info($logMessage);
+            $io->success($logMessage);
+        } else {
+            $logMessage = 'Couldn\'t fetch file from download.maxmind.com.';
+            $io->error($logMessage);
+            $this->logger->error($logMessage);
+            throw new Exception($logMessage);
         }
+        return 0;
     }
 }

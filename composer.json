@@ -21,7 +21,8 @@
   ],
   "require": {
     "typo3/cms-core": "^9.5.0||^10.0.0||^11.0.0",
-    "geoip2/geoip2": "^2.9.0"
+    "geoip2/geoip2": "^2.9.0",
+    "pear/archive_tar": "^1.4"
   },
   "replace": {
     "typo3-ter/site-language-redirection": "self.version"
@@ -33,7 +34,11 @@
   },
   "config": {
     "vendor-dir": ".Build/vendor/",
-    "bin-dir": ".Build/bin/"
+    "bin-dir": ".Build/bin/",
+    "allow-plugins": {
+      "typo3/cms-composer-installers": true,
+      "typo3/class-alias-loader": true
+    }
   },
   "extra": {
     "typo3/cms": {

@@ -29,6 +29,8 @@ class UpdateDB extends Command implements LoggerAwareInterface
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $requireLicenseKey = false;
+        $licenseKey = null;
         $io = new SymfonyStyle($input, $output);
         $io->title('Fetching database');
         $path = Environment::getVarPath() . '/sitelanguageredirection/';
@@ -45,14 +47,20 @@ class UpdateDB extends Command implements LoggerAwareInterface
             if ($method !== RedirectionMiddleware::REDIRECT_METHOD_IPADDRESS) {
                 continue; //Skip this site
             }
-            $licenseKey =  $site->getConfiguration()['SiteLanguageMaxmindLicenseKey'];
+            $requireLicenseKey = true;
+            $licenseKey = $site->getConfiguration()['SiteLanguageMaxmindLicenseKey'];
+            if (!empty($licenseKey)) {
+               break;
+            }
+        }
+
+        if ($requireLicenseKey) {
             if (empty($licenseKey)) {
                 $logMessage = 'Maxmind license key not given.';
                 $io->error($logMessage);
                 $this->logger->error($logMessage);
                 throw new Exception($logMessage);
             }
-
             /** @var RequestFactory $requestFactory */
             $requestFactory = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Http\\RequestFactory');
             $url = 'https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country&license_key=' . $licenseKey . '&suffix=tar.gz';

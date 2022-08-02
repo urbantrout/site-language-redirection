@@ -107,7 +107,7 @@ class RedirectionMiddleware implements MiddlewareInterface
         $siteLanguages = $site->getLanguages();
 
         $siteLanguagesFallbacks = [];
-        if (is_array($site->getConfiguration()['SiteLanguageRedirectionFallbacks']) && !empty($site->getConfiguration()['SiteLanguageRedirectionFallbacks'])) {
+        if (is_array($site->getConfiguration()['SiteLanguageRedirectionFallbacks'] ?? null) && !empty($site->getConfiguration()['SiteLanguageRedirectionFallbacks'])) {
             $siteLanguagesFallbacks = $site->getConfiguration()['SiteLanguageRedirectionFallbacks'];
         }
 

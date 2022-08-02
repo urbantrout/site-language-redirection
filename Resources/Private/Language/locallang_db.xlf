@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="messages" date="2019-08-09T08:33:58Z">
+		<header>
+			<type>database</type>
+			<description>Language labels for database tables/fields belonging to extension 'site-language-redirection'</description>
+			<generator>LFEditor</generator>
+			<authorName>Matthia Adrowski</authorName>
+			<authorEmail>matthias.adrowski@sgalinski.de</authorEmail>
+		</header>
+		<body>
+			<trans-unit id="pages.tx_sitelanguageredirection_stop.label" xml:space="preserve">
+				<source>Stop Site Language Redirects</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

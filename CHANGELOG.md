@@ -1,3 +1,6 @@
+# 2.3.4
+
+- Avoid notices with PHP8 ([PR #41](https://github.com/urbantrout/site-language-redirection/pull/41)) (thanks [@georgringer](https://github.com/georgringer))
 # 2.3.0
 
 - Fix Max-Age cookie value. ([#16](https://github.com/urbantrout/site-language-redirection/issues/16)) (thanks Aleksandra Fey)

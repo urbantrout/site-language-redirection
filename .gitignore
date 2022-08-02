@@ -1,3 +1,4 @@
 .Build
 .php_cs.cache
 Documentation-GENERATED-temp
+regex.txt

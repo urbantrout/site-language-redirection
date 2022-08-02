@@ -48,3 +48,7 @@ SiteLanguageRedirectionFallbacks:
   fr: 'en'
   it: 'en'
 ```
+
+### Update Bots Regex
+
+Details in Scripts/README.md

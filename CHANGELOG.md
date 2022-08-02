@@ -1,4 +1,4 @@
-# 2.3.4
+# 2.3.3
 
 - Avoid notices with PHP8 ([PR #41](https://github.com/urbantrout/site-language-redirection/pull/41)) (thanks [@georgringer](https://github.com/georgringer))
 # 2.3.0

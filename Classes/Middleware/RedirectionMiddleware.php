@@ -51,6 +51,16 @@ class RedirectionMiddleware implements MiddlewareInterface
             return $handler->handle($request);
         }
 
+        /**
+         * Do not redirect if URL has a language defined.
+         * Even better: Create an option if you want to force language if a language is defined in URL.
+         */
+        $languageId = $request->getAttribute('language')->getLanguageId();
+
+        if (($languageId !== null) && ($languageId !== 0)) {
+            return $handler->handle($request);
+        }
+
         $response = $this->setCookieOnLanguageChange($request, $handler, $cookieName);
         if ($response) {
             return $response;

@@ -165,7 +165,7 @@ class RedirectionMiddleware implements MiddlewareInterface
         }, array_map(function ($matchingSiteLanguageCode) use ($siteLanguages, $siteLanguagesFallbacks) {
             return array_filter($siteLanguages, function ($siteLanguage) use ($matchingSiteLanguageCode, $siteLanguagesFallbacks) {
                 /** @var SiteLanguage $siteLanguage */
-                return strtolower($siteLanguage->getHreflang()) === $matchingSiteLanguageCode || $siteLanguage->getTwoLetterIsoCode() === $matchingSiteLanguageCode || strtolower($siteLanguage->getHreflang()) === $siteLanguagesFallbacks[$matchingSiteLanguageCode] || $siteLanguage->getTwoLetterIsoCode() === $siteLanguagesFallbacks[$matchingSiteLanguageCode];
+                return strtolower($siteLanguage->getHreflang()) === $matchingSiteLanguageCode || $siteLanguage->getTwoLetterIsoCode() === $matchingSiteLanguageCode || strtolower($siteLanguage->getHreflang()) === ($siteLanguagesFallbacks[$matchingSiteLanguageCode] ?? null) || $siteLanguage->getTwoLetterIsoCode() === ($siteLanguagesFallbacks[$matchingSiteLanguageCode] ?? null);
             });
         }, $matchingSiteLanguageCodes));
 

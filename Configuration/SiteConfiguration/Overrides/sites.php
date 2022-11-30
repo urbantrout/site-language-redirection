@@ -14,4 +14,12 @@ $GLOBALS['SiteConfiguration']['site']['columns']['SiteLanguageRedirectionMethod'
     ],
 ];
 
-$GLOBALS['SiteConfiguration']['site']['types']['0']['showitem'] = $GLOBALS['SiteConfiguration']['site']['types']['0']['showitem'] . ',--div--;Site Language Redirection,SiteLanguageRedirectionMethod';
+$GLOBALS['SiteConfiguration']['site']['columns']['SiteLanguageMaxmindLicenseKey'] = [
+    'label' => 'Maxmind license key Method',
+    'description' => 'Enter license key for Maxmind GeoLite2-Country database when using IP address',
+    'config' => [
+        'type' => 'input'
+    ],
+];
+
+$GLOBALS['SiteConfiguration']['site']['types']['0']['showitem'] = $GLOBALS['SiteConfiguration']['site']['types']['0']['showitem'] . ',--div--;Site Language Redirection,SiteLanguageRedirectionMethod,SiteLanguageMaxmindLicenseKey';

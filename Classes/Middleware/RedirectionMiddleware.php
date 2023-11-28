@@ -51,7 +51,8 @@ class RedirectionMiddleware implements MiddlewareInterface
             return $handler->handle($request);
         }
 
-        $response = $this->setCookieOnLanguageChange($request, $handler, $cookieName);
+        $response = $this->setCookieOnLanguageChange($request, $handler, $cookieName, $handler);
+
         if ($response) {
             return $response;
         }
@@ -84,14 +85,17 @@ class RedirectionMiddleware implements MiddlewareInterface
     /**
      * Returns redirect response based on users browser language.
      * Sets the cookie for 30 days.
-     *
      * @param ServerRequestInterface $request
      * @param string $cookieName
-     *
+     * @param RequestHandlerInterface $handler
      * @return ResponseInterface|null
      */
-    protected function getRedirectResponseByBrowserLanguage(ServerRequestInterface $request, $cookieName): ?ResponseInterface
+    protected function getRedirectResponseByBrowserLanguage(
+        ServerRequestInterface $request,
+        string $cookieName,
+    ): ?ResponseInterface
     {
+
         // Do not redirect if preferred language is set as cookie.
         if (array_key_exists($cookieName, $request->getCookieParams())) {
             return null;
@@ -111,12 +115,13 @@ class RedirectionMiddleware implements MiddlewareInterface
             $siteLanguagesFallbacks = $site->getConfiguration()['SiteLanguageRedirectionFallbacks'];
         }
 
-        $acceptLanguages = $request->getHeader('accept-language');
+        $acceptLanguages = (string) $request->getHeader('accept-language');
+
         if (!empty($acceptLanguages)) {
             $acceptLanguages = array_unique(
                 array_map(function ($language) {
                     return strtolower(explode(';', $language)[0]);
-                }, explode(',', $acceptLanguages[0]))
+                }, explode(',', $acceptLanguages))
             );
         } else {
             // Do not redirect if no accept languages are set.

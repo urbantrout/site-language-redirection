@@ -1,0 +1,13 @@
+services:
+  _defaults:
+    autoconfigure: true
+    autowire: true
+    public: true
+  UrbanTrout\SiteLanguageRedirection\:
+    resource: '../Classes/*'
+
+  UrbanTrout\SiteLanguageRedirection\Command\UpdateDB:
+    tags:
+      - name: 'console.command'
+        command: 'sitelanguageredirection:updatedb'
+        description: 'Update language DB'

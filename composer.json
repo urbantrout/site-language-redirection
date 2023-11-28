@@ -20,7 +20,7 @@
     }
   ],
   "require": {
-    "typo3/cms-core": "^9.5.0||^10.4||^11",
+    "typo3/cms-core": "^12.4",
     "geoip2/geoip2": "^2.9.0"
   },
   "replace": {

@@ -33,15 +33,19 @@ class UpdateDB extends Command implements LoggerAwareInterface
         $filename = 'GeoLite2-Country.mmdb';
 
         /** @var RequestFactory $requestFactory */
-        $requestFactory = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Http\\RequestFactory');
-        $url = 'https://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.mmdb.gz';
+        $requestFactory = GeneralUtility::makeInstance(RequestFactory::class);
+
+        // TODO: Needs a license now!
+        // $url = 'https://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.mmdb.gz';
+
+        $url = 'https://cdn.jsdelivr.net/npm/geolite2-country@1.0.2/GeoLite2-Country.mmdb.gz';
 
         // Return a PSR-7 compliant response object.
         $response = $requestFactory->request($url, 'GET');
 
         // Get the content as a stream on a successful request.
         if ($response->getStatusCode() === 200) {
-            if (strpos($response->getHeaderLine('Content-Type'), 'application/octet-stream') === 0) {
+            if (strpos($response->getHeaderLine('Content-Type'), 'application/gzip') === 0) {
                 $content = gzdecode($response->getBody()->getContents());
                 $result = GeneralUtility::writeFileToTypo3tempDir($path . $filename, $content);
 
@@ -49,16 +53,19 @@ class UpdateDB extends Command implements LoggerAwareInterface
                     $logMessage = 'Couldn\'t save DB file.';
                     $io->error($logMessage);
                     $this->logger->error($logMessage);
-                    throw new Exception($logMessage);
+                    return 1701171771;
+                    //throw new \Exception($logMessage);
                 }
 
                 $logMessage = 'DB file successfully saved to: ' . $path . $filename;
                 $this->logger->info($logMessage);
                 $io->success($logMessage);
+                return 0;
             } else {
                 $logMessage = 'Couldn\'t fetch file from geolite.maxmind.com.';
                 $io->error($logMessage);
                 $this->logger->error($logMessage);
+                return 1701171772;
             }
         }
     }

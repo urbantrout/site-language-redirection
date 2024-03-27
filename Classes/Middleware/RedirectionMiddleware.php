@@ -44,6 +44,19 @@ class RedirectionMiddleware implements MiddlewareInterface
          */
         $cookieName = 'site-language-preference';
 
+        /** @var Site $site */
+        $site = $request->getAttribute('site');
+
+        /**
+         * Do not redirect if site language redirection is disabled for a site
+         */
+        if (
+            !empty($site->getConfiguration()['SiteLanguageRedirectionDisable']) &&
+            $site->getConfiguration()['SiteLanguageRedirectionDisable']
+        ) {
+            return $handler->handle($request);
+        }
+
         /**
          * Do not redirect search engine bots.
          */
@@ -61,8 +74,6 @@ class RedirectionMiddleware implements MiddlewareInterface
             return $response;
         }
 
-        /** @var Site $site */
-        $site = $request->getAttribute('site');
         // Set default method in case site configuration isn't yet updated.
         $method = $site->getConfiguration()['SiteLanguageRedirectionMethod'] ?? self::REDIRECT_METHOD_BROWSER;
 
